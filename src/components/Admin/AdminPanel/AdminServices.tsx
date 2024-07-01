@@ -48,11 +48,11 @@ const AdminServices = () => {
       });
   }, [editService]); // Refresh when editService changes
 
-  const editScheme = (serviceName:any) => {
+  const editScheme = (serviceName: any) => {
     setEditService(serviceName); // Set the service to be edited
   };
 
-  const deleteScheme = (serviceName:any) => {
+  const deleteScheme = (serviceName: any) => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete scheme: ${serviceName}?`
     );
@@ -76,7 +76,7 @@ const AdminServices = () => {
           {loading ? (
             <SchemeSkeleton isadmin={true} />
           ) : (
-            <div className="grid grid-cols-3 gap-5  overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-5 overflow-y-auto">
               {GrampanchayatSchemes.map((data) => (
                 <div
                   key={data.id}
@@ -124,7 +124,7 @@ const AdminServices = () => {
 
       {/* Edit Service Panel */}
       {editService && (
-        <div className="fixed inset-0 p flex items-center justify-center bg-gray-800 bg-opacity-50 p-10">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 p-10">
           <div className="bg-white p-6 rounded-lg shadow-md h-screen overflow-y-auto w-full max-w-lg">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Edit Service</h2>

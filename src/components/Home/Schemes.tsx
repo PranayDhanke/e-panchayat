@@ -45,7 +45,7 @@ const Schemes = () => {
           {loading ? (
             <SchemeSkeleton isadmin={false} />
           ) : (
-            <div className="grid grid-cols-3 mx-5 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-5 gap-8">
               {GrampanchayatSchemes.map((data) => (
                 <div
                   key={data.id}

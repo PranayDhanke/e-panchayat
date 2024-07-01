@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { get, ref } from "firebase/database";
 import { auth, database } from "@/database/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { toast } from "react-toastify";
 
 export default function StaffLogin() {
   const router = useRouter();
@@ -22,10 +23,10 @@ export default function StaffLogin() {
               if (Response.child(username).exists()) {
                 const data = Response.child(username).exportVal();
                 if (username == data.username && password == data.password) {
-                  alert("Staff logged in");
+                  toast.success("Staff logged in");
                   router.replace(`/Staff/Home/${username}`);
                 } else {
-                  alert("Incorrect Username or password");
+                  toast.error("Incorrect Username or password");
                 }
               }
             }

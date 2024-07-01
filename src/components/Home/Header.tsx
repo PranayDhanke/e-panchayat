@@ -40,13 +40,13 @@ const Header = () => {
 
   return (
     <div className="relative">
-      <div className="flex justify-between p-4 bg-white items-center mx-auto shadow-lg px-10">
+      <div className="flex justify-between p-4 bg-white items-center mx-auto shadow-lg lg:px-10">
         <div className="flex gap-10 items-center">
           <Link href={"/"} className="flex items-center gap-2">
             <Image className="w-5" src={logo} alt="logo"></Image>
             <h1 className="font-extrabold text-xl text-darkblue">E-GRAM</h1>
           </Link>
-          <h1 className="font-bold text-lg text-purple underline underline-offset-8">
+          <h1 className="font-bold hidden lg:flex text-lg text-purple underline underline-offset-8">
             Lets Make India Digital !
           </h1>
         </div>

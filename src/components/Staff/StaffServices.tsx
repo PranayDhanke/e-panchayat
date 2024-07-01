@@ -44,7 +44,7 @@ const StaffServices = () => {
           {loading ? (
             <SchemeSkeleton isadmin={true} />
           ) : (
-            <div className="grid grid-cols-3 gap-5  overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5  overflow-y-auto">
               {GrampanchayatSchemes.map((data) => (
                 <div
                   key={data.id}

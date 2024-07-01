@@ -85,7 +85,7 @@ const MyAppliedServices = () => {
         <h1 className="text-2xl underline underline-offset-8 font-bold">
           My Applied Services
         </h1>
-        <div className="grid grid-cols-3 place-items-center gap-5 mt-10 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-center gap-5 mt-10 ">
           {applicants.map((applicant) => (
             <div
               key={applicant.userid}
@@ -138,8 +138,8 @@ const MyAppliedServices = () => {
         {panel ? (
           ""
         ) : (
-          <div className="fixed  inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <div className="bg-white p-6 w-1/2 h-screen overflow-y-scroll rounded-lg shadow-lg">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+            <div className="bg-white p-6 lg:w-1/2 h-screen overflow-y-scroll w-full rounded-lg shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">{"Application"}</h2>
                 <MdClose

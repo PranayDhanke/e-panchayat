@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AdminPanelHeader from "./AdminPanel/AdminPanelHeader";
 import AdminDashboard from "./AdminPanel/Dashboard";
 import AddAdmin from "./AdminPanel/AddAdmin";
@@ -9,18 +9,33 @@ import AddAdminService from "./AdminPanel/AddAdminService";
 
 const AdminPanel = () => {
   const [selectedTab, setSelectedTab] = useState("Dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <div>
-      <div className="flex min-h-screen my-3 shadow-md bg-gray-100 ">
-        <nav className="w-1/4 bg-white shadow-md">
-          <ul className="space-y-4 p-4">
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex flex-col md:flex-row my-3 shadow-md">
+        <nav className="w-full md:w-1/4 bg-white shadow-md md:h-screen">
+          <button
+            className="md:hidden p-4 bg-blue-500 text-white w-full text-left"
+            onClick={toggleMobileMenu}
+          >
+            Menu
+          </button>
+          <ul className={`space-y-4 p-4 ${isMobileMenuOpen ? "block" : "hidden md:block"}`}>
             <li
               className={`cursor-pointer p-2 ${
                 selectedTab === "Dashboard"
                   ? "bg-blue-500 text-white"
                   : "hover:bg-blue-100"
               }`}
-              onClick={() => setSelectedTab("Dashboard")}
+              onClick={() => {
+                setSelectedTab("Dashboard");
+                setIsMobileMenuOpen(false);
+              }}
             >
               Dashboard
             </li>
@@ -30,7 +45,10 @@ const AdminPanel = () => {
                   ? "bg-blue-500 text-white"
                   : "hover:bg-blue-100"
               }`}
-              onClick={() => setSelectedTab("Add Admins")}
+              onClick={() => {
+                setSelectedTab("Add Admins");
+                setIsMobileMenuOpen(false);
+              }}
             >
               Add Admins
             </li>
@@ -40,7 +58,10 @@ const AdminPanel = () => {
                   ? "bg-blue-500 text-white"
                   : "hover:bg-blue-100"
               }`}
-              onClick={() => setSelectedTab("Add Staff")}
+              onClick={() => {
+                setSelectedTab("Add Staff");
+                setIsMobileMenuOpen(false);
+              }}
             >
               Add Staff
             </li>
@@ -50,7 +71,10 @@ const AdminPanel = () => {
                   ? "bg-blue-500 text-white"
                   : "hover:bg-blue-100"
               }`}
-              onClick={() => setSelectedTab("Service")}
+              onClick={() => {
+                setSelectedTab("Service");
+                setIsMobileMenuOpen(false);
+              }}
             >
               Service
             </li>
@@ -60,38 +84,21 @@ const AdminPanel = () => {
                   ? "bg-blue-500 text-white"
                   : "hover:bg-blue-100"
               }`}
-              onClick={() => setSelectedTab("Add Services")}
+              onClick={() => {
+                setSelectedTab("Add Services");
+                setIsMobileMenuOpen(false);
+              }}
             >
               Add Services
             </li>
           </ul>
         </nav>
         <div className="flex-grow p-4">
-          {selectedTab === "Dashboard" && (
-            <div>
-              <AdminDashboard />
-            </div>
-          )}
-          {selectedTab === "Add Admins" && (
-            <div>
-              <AddAdmin />
-            </div>
-          )}
-          {selectedTab === "Add Staff" && (
-            <div>
-              <AddStaff />
-            </div>
-          )}
-          {selectedTab === "Service" && (
-            <div>
-              <AdminServices />
-            </div>
-          )}
-          {selectedTab === "Add Services" && (
-            <div>
-              <AddAdminService />
-            </div>
-          )}
+          {selectedTab === "Dashboard" && <AdminDashboard />}
+          {selectedTab === "Add Admins" && <AddAdmin />}
+          {selectedTab === "Add Staff" && <AddStaff />}
+          {selectedTab === "Service" && <AdminServices />}
+          {selectedTab === "Add Services" && <AddAdminService />}
         </div>
       </div>
     </div>

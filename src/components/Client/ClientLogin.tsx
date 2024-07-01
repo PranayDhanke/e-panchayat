@@ -11,21 +11,13 @@ export default function ClientLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(()=>{
-    onAuthStateChanged(auth , (user)=>{
-      if (user) {
-        router.push("/")        
-      }
-    })
-  })
-
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     try {
       signInWithEmailAndPassword(auth , email , password).then((resopnse)=>{
         if(resopnse){
           toast.success("Log in successfully")
-          router.back();
+          router.replace("/")
         }
       })
     } catch (error) {

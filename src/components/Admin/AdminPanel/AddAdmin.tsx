@@ -4,24 +4,19 @@ import React, { FormEvent, useState } from "react";
 import { toast } from "react-toastify";
 
 const AddAdmin = () => {
-  const [username, setusername] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
       await set(ref(database, `Admin/${username}`), {
-        username: username,
-        password: password,
-      })
-        .then(() => {
-          toast.success("Admin Added Successfully")
-        })
-        .catch(() => {
-          toast.error("Error while adding the admin");
-        });
+        username,
+        password,
+      });
+      toast.success("Admin Added Successfully");
     } catch (error) {
-      toast.error("Error")
+      toast.error("Error while adding the admin");
     }
   };
 
@@ -38,7 +33,7 @@ const AddAdmin = () => {
           <input
             type="text"
             value={username}
-            onChange={(e) => setusername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             className="mt-1 p-2 border rounded w-full"
             required
           />
@@ -48,7 +43,6 @@ const AddAdmin = () => {
           <label className="block text-gray-700">Password</label>
           <input
             type="password"
-            name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="mt-1 p-2 border rounded w-full"

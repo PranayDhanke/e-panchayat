@@ -1,6 +1,6 @@
 import DashahboardSkeleton from "@/components/Skeletons/DashahboardSkeleton";
 import { database } from "@/database/firebase";
-import { onValue, ref, update } from "firebase/database";
+import { get, onValue, ref, update } from "firebase/database";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -81,7 +81,7 @@ const StaffDashboard = () => {
       });
       setpanel(true);
     } catch (error) {
-      toast.error("Error updating approval status")
+      toast.error("Error updating approval status:");
     }
   };
 
@@ -97,7 +97,7 @@ const StaffDashboard = () => {
       });
       setpanel(true);
     } catch (error) {
-      toast.error("Error updating approval status")
+      toast.error("Error updating approval status:");
     }
   };
 
@@ -111,17 +111,17 @@ const StaffDashboard = () => {
           {applicants.map((applicant) => (
             <div
               key={applicant.userid}
-              className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm"
+              className="flex flex-col md:flex-row items-center justify-between bg-white p-4 rounded-lg shadow-sm"
             >
               <div className="flex items-center">
-                <div className=" relative w-12 h-12 mr-4">
+                <div className="relative w-12 h-12 mr-4">
                   <Image
                     src={applicant.profile}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="rounded-full"
                     alt={applicant.name}
-                  ></Image>
+                  />
                 </div>
                 <span className="text-xl font-semibold">{applicant.name}</span>
               </div>
@@ -133,12 +133,12 @@ const StaffDashboard = () => {
                     {applicant.isRejected ? (
                       <span className="font-bold text-red-500">Rejected</span>
                     ) : (
-                      <span className="font-bold ">Not viwed</span>
+                      <span className="font-bold">Not viewed</span>
                     )}
                   </div>
                 )}
               </div>
-              <div>
+              <div className="mt-2 md:mt-0">
                 <button
                   onClick={() => openPanel(applicant)}
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -155,21 +155,18 @@ const StaffDashboard = () => {
       {panel ? (
         ""
       ) : (
-        <div className="fixed  inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 w-1/2 h-screen overflow-y-scroll rounded-lg shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 w-full md:w-1/2 h-full md:h-auto overflow-y-scroll rounded-lg shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">{"Application"}</h2>
+              <h2 className="text-xl font-semibold">Application</h2>
               <MdClose
                 onClick={() => setpanel(!panel)}
-                className="text-gray-500 text-2xl cursor-pointer hover:text-gray-700 "
+                className="text-gray-500 text-2xl cursor-pointer hover:text-gray-700"
               />
             </div>
             {selectedApplicant.map((applicant) => (
-              <div key={applicant.userid} >
-                <div
-                  key={applicant.userid}
-                  className="flex flex-col items-center mt-10"
-                >
+              <div key={applicant.userid}>
+                <div className="flex flex-col items-center mt-10">
                   <div className="relative w-32 h-32">
                     <Image
                       fill
@@ -177,20 +174,20 @@ const StaffDashboard = () => {
                       src={applicant.profile || ""}
                       className="rounded-full"
                       alt=""
-                    ></Image>
+                    />
                   </div>
                 </div>
                 <hr className="mt-5" />
-                <div className="mt-5 grid grid-cols-2 gap-3 w-fit">
-                  <h1 className="font-bold text-xl">Applicant Detail : </h1>
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                  <h1 className="font-bold text-xl">Applicant Detail :</h1>
                   <br />
                   <hr />
                   <br />
                   <span className="font-bold text-lg">Service Name :</span>
                   <span>{applicant.scheme}</span>
-                  <span className="font-bold text-lg">Name : </span>
+                  <span className="font-bold text-lg">Name :</span>
                   <span>{applicant.name}</span>
-                  <span className="font-bold text-lg">Email : </span>
+                  <span className="font-bold text-lg">Email :</span>
                   <span>{applicant.email}</span>
                   <span className="font-bold text-lg">Mobile Number :</span>
                   <span>{applicant.mobile}</span>
@@ -198,7 +195,8 @@ const StaffDashboard = () => {
                   <span>{applicant.aadharnum}</span>
                   <span className="font-bold text-lg">Date Applied :</span>
                   <span>{applicant.applyDate}</span>
-                  <hr /> <br />
+                  <hr />
+                  <br />
                   <h1 className="font-bold text-xl">View Uploaded Documents</h1>
                   <br />
                   <hr />
@@ -222,17 +220,17 @@ const StaffDashboard = () => {
                     <span>View</span>
                   </Link>
                 </div>
-                <div className="mt-10 flex gap-5 items-center">
+                <div className="mt-10 flex flex-col md:flex-row gap-5 items-center">
                   <div
                     onClick={() => setApproval(applicant)}
-                    className=" cursor-pointer flex items-center bg-green-600 gap-1 rounded-lg p-3 w-fit text-white "
+                    className="cursor-pointer flex items-center bg-green-600 gap-1 rounded-lg p-3 w-fit text-white"
                   >
                     <MdOutlineDownloadDone className="text-xl" />
                     <text>Approve</text>
                   </div>
                   <div
                     onClick={() => setReject(applicant)}
-                    className=" cursor-pointer flex items-center bg-red-500 gap-1 rounded-lg p-3 w-fit text-white "
+                    className="cursor-pointer flex items-center bg-red-500 gap-1 rounded-lg p-3 w-fit text-white"
                   >
                     <MdCancel />
                     <text>Reject</text>

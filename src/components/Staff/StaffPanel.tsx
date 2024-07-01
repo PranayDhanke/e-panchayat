@@ -8,10 +8,10 @@ const StaffPanel = () => {
     const [selectedTab, setSelectedTab] = useState("Dashboard");
   return (
     <div>
-        <div className="flex min-h-screen my-3 shadow-md bg-gray-100 ">
-        <nav className="w-1/4 bg-white shadow-md">
+      <div className="flex flex-col md:flex-row min-h-screen my-3 shadow-md bg-gray-100">
+        <nav className="w-full md:w-1/4 bg-white shadow-md">
           <ul className="space-y-4 p-4">
-          <li
+            <li
               className={`cursor-pointer p-2 ${
                 selectedTab === "Dashboard"
                   ? "bg-blue-500 text-white"
@@ -31,7 +31,6 @@ const StaffPanel = () => {
             >
               Services
             </li>
-            
           </ul>
         </nav>
         <div className="flex-grow p-4">

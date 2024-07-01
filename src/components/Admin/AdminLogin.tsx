@@ -1,6 +1,10 @@
 "use client";
+import { auth, database } from "@/database/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { get, ref } from "firebase/database";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function AdminLogin() {
 
@@ -9,10 +13,31 @@ export default function AdminLogin() {
   const [username, setusername] = useState("");
   const [password, setpassword] = useState("");
 
-  const loginAdmin = (event: FormEvent) => {
+  const loginAdmin = async (event: FormEvent) => {
     event.preventDefault();
-    if (username == "admin" && password == "admin") {
-        router.push('/Admin')
+    try {
+      onAuthStateChanged(auth , (user)=>{
+        if (user) {
+          toast.warning("Logout first")
+          router.push("/")
+        }else{
+          get(ref(database , "Admin")).then((Response)=>{
+            if (Response.exists()) {
+              if (Response.child(username).exists()) {
+                const data = Response.child(username).exportVal();
+                if (username == data.username && password == data.password) {
+                  toast.success("Admin Logged in");
+                  router.push(`/Admin/Home/${username}`)
+                }else{
+                  toast.error("Incorrect Username or password");
+                }
+              }
+            }
+          })
+        }
+      })
+    } catch (error) {
+      toast.error("Error")
     }
   };
   return (

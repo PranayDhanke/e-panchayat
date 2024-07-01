@@ -4,51 +4,74 @@ import Header from "../Home/Header";
 import { MdCancel, MdClose, MdOutlineDownloadDone } from "react-icons/md";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, database } from "@/database/firebase";
+import { onValue, ref } from "firebase/database";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const MyAppliedServices = () => {
   const [applicants, setApplicants] = useState([
     {
-      id: "",
-      image: "",
-      applicant_name: "",
-      scheme_name: "",
-      date_applied: "",
+      name: "",
+      profile: "",
+      scheme: "",
+      userid: "",
       email: "",
-      mobile_number: "",
-      aadhar_number: "",
-      addhar_card: "",
+      mobile: "",
+      aadharnum: "",
+      isApproved: false,
+      isRejected: false,
+      applyDate: "",
+      aadharcard: "",
       proof: "",
-      isapproved: false,
-      isrejeted: false,
     },
   ]);
   const [selectedApplicant, setSelectedApplicant] = useState([
     {
-      id: "",
-      image: "",
-      applicant_name: "",
-      scheme_name: "",
-      date_applied: "",
+      name: "",
+      profile: "",
+      scheme: "",
+      userid: "",
       email: "",
-      mobile_number: "",
-      aadhar_number: "",
-      addhar_card: "",
+      mobile: "",
+      aadharnum: "",
+      isApproved: false,
+      isRejected: false,
+      applyDate: "",
+      aadharcard: "",
       proof: "",
-      isapproved: false,
-      isrejeted: false,
     },
   ]);
   const [panel, setpanel] = useState(true);
   const [loading, setloading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    fetch("/applicants.json")
-      .then((response) => response.json())
-      .then((data) => {
-        setApplicants(data);
-        setloading(false);
-      });
-  }, []);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const applicantsRef = ref(database, "UserAppliedSchemes");
+        onValue(applicantsRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            const allApplicants = Array();
+            Object.keys(data).forEach((scheme) => {
+              const schemeApplicants = data[scheme];
+              Object.keys(schemeApplicants).forEach((userid) => {
+                if (userid == user.uid) {
+                  allApplicants.push(schemeApplicants[userid]);
+                  setApplicants(allApplicants);
+                  setloading(false);
+                }
+              });
+            });
+          }
+        });
+      } else {
+        router.replace("/Client/sign-in");
+      }
+    });
+  }, [router]);
 
   const openPanel = (applicant: any) => {
     setSelectedApplicant([applicant]);
@@ -64,24 +87,29 @@ const MyAppliedServices = () => {
         </h1>
         <div className="grid grid-cols-3 place-items-center gap-5 mt-10 ">
           {applicants.map((applicant) => (
-            <div className="bg-white p-4 rounded-lg shadow-sm h-52 w-96">
+            <div
+              key={applicant.userid}
+              className="bg-white p-4 rounded-lg shadow-sm h-52 w-96"
+            >
               <div>
-                <h1 className="font-bold text-lg mb-5">
-                  {applicant.scheme_name}
-                </h1>
+                <h1 className="font-bold text-lg mb-5">{applicant.scheme}</h1>
               </div>
               <div
-                key={applicant.id}
+                key={applicant.userid}
                 className="flex gap-20 items-center justify-between "
               >
                 <div className="flex items-center">
-                  <img
-                    src={applicant.image}
-                    className="w-12 h-12 rounded-full mr-4"
-                    alt={applicant.applicant_name}
-                  />
+                  <div className=" relative w-12 h-12 mr-4">
+                    <Image
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      src={applicant.profile || ""}
+                      className="rounded-full"
+                      alt={applicant.name || ""}
+                    ></Image>
+                  </div>
                   <span className="text-xl font-semibold">
-                    {applicant.applicant_name}
+                    {applicant.name}
                   </span>
                 </div>
                 <div onClick={() => openPanel(applicant)}>
@@ -91,11 +119,11 @@ const MyAppliedServices = () => {
                 </div>
               </div>
               <div className="mt-5">
-                {applicant.isapproved ? (
+                {applicant.isApproved ? (
                   <span className="font-bold text-green-500">Approved</span>
                 ) : (
                   <div>
-                    {applicant.isrejeted ? (
+                    {applicant.isRejected ? (
                       <span className="font-bold text-red-500">Rejected</span>
                     ) : (
                       <span className="font-bold ">Not viwed</span>
@@ -120,13 +148,16 @@ const MyAppliedServices = () => {
                 />
               </div>
               {selectedApplicant.map((applicant) => (
-                <div>
+                <div key={applicant.userid}>
                   <div className="flex flex-col items-center mt-10">
-                    <img
-                      src={applicant.image}
-                      className="w-32 rounded-full"
-                      alt=""
-                    />
+                    <div className="relative w-32 h-32">
+                      <Image
+                        src={applicant.profile}
+                        className=" rounded-full"
+                        alt=""
+                        fill
+                      ></Image>
+                    </div>
                   </div>
                   <hr className="mt-5" />
                   <div className="mt-5 grid grid-cols-2 gap-3 w-fit">
@@ -135,17 +166,17 @@ const MyAppliedServices = () => {
                     <hr />
                     <br />
                     <span className="font-bold text-lg">Service Name :</span>
-                    <span>{applicant.scheme_name}</span>
+                    <span>{applicant.scheme}</span>
                     <span className="font-bold text-lg">Name : </span>
-                    <span>{applicant.applicant_name}</span>
+                    <span>{applicant.name}</span>
                     <span className="font-bold text-lg">Email : </span>
                     <span>{applicant.email}</span>
                     <span className="font-bold text-lg">Mobile Number :</span>
-                    <span>{applicant.mobile_number}</span>
+                    <span>{applicant.mobile}</span>
                     <span className="font-bold text-lg">Aadhar Number :</span>
-                    <span>{applicant.aadhar_number}</span>
+                    <span>{applicant.aadharnum}</span>
                     <span className="font-bold text-lg">Date Applied :</span>
-                    <span>{applicant.date_applied}</span>
+                    <span>{applicant.applyDate}</span>
                     <hr /> <br />
                     <h1 className="font-bold text-xl">
                       View Uploaded Documents
@@ -155,7 +186,7 @@ const MyAppliedServices = () => {
                     <br />
                     <span className="font-bold text-lg">Aadhar Card</span>
                     <Link
-                      href={applicant.addhar_card}
+                      href={applicant.aadharcard}
                       target="_blank"
                       className="flex items-center gap-2 rounded-md cursor-pointer bg-blue-600 w-fit p-2 text-white"
                     >

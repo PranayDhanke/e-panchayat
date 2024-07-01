@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { FaHome, FaList } from "react-icons/fa";
 import { FiMenu, FiUserPlus } from "react-icons/fi";
@@ -10,9 +10,33 @@ import { MdClose, MdDownloadDone } from "react-icons/md";
 import { RiAdminFill } from "react-icons/ri";
 import logo from "@/images/logo.svg";
 import Image from "next/image";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/database/firebase";
+import { LuLogOut } from "react-icons/lu";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const [panel, setpanel] = useState(false);
+
+  const [user, setCurrentUser] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const signOutUser = () => {
+    signOut(auth).then(()=>{
+      toast.success("Logged Out")
+      setCurrentUser(!user)
+    })
+  }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(true);
+        setLoading(false);
+      }
+    });
+    return unsubscribe;
+  }, [user]);
 
   return (
     <div className="relative">
@@ -22,15 +46,27 @@ const Header = () => {
             <Image className="w-5" src={logo} alt="logo"></Image>
             <h1 className="font-extrabold text-xl text-darkblue">E-GRAM</h1>
           </Link>
-          <h1 className="font-bold text-lg text-purple underline underline-offset-8">Lets Make India Digital !</h1>
+          <h1 className="font-bold text-lg text-purple underline underline-offset-8">
+            Lets Make India Digital !
+          </h1>
         </div>
         <div className="flex items-center gap-10">
-          <Link
-            href={"/Client/sign-in"}
-            className="py-2 cursor-pointer px-4 bg-bluedarkish text-white font-bold rounded-lg"
-          >
-            Login
-          </Link>
+          {user ? (
+            <div
+              onClick={() => signOutUser()}
+              className="gap-2 flex items-center py-2 cursor-pointer px-4 bg-red-500 text-white font-bold rounded-lg"
+            >
+              <span>Logout</span>
+              <LuLogOut className="text-xl" />
+            </div>
+          ) : (
+            <Link
+              href={"/Client/sign-in"}
+              className="py-2 cursor-pointer px-4 bg-bluedarkish text-white font-bold rounded-lg"
+            >
+              Login
+            </Link>
+          )}
           {panel ? (
             <MdClose
               className="text-xl font-bold cursor-pointer "
@@ -52,12 +88,12 @@ const Header = () => {
         <h1 className="text-2xl font-bold my-5">Menu</h1>
         <hr className="w-full" />
         <nav className="list-none flex flex-col">
-          <div onClick={() => setpanel(!panel)} className="listdivstyle">
+          <Link href={"/"} onClick={() => setpanel(!panel)} className="listdivstyle">
             <FaHome />
             <li className="listyle">Home</li>
-          </div>
+          </Link>
           <Link
-            href={"#Schemes"}
+            href={"/#Schemes"}
             onClick={() => {
               setpanel(!panel);
             }}
@@ -67,7 +103,11 @@ const Header = () => {
             <FaList />
             <li className="listyle">Schemes</li>
           </Link>
-          <Link href={"#Contact"} onClick={()=>setpanel(!panel)} className="listdivstyle">
+          <Link
+            href={"/#Contact"}
+            onClick={() => setpanel(!panel)}
+            className="listdivstyle"
+          >
             <IoIosHelpCircleOutline />
             <li className="listyle">Contact US</li>
           </Link>
@@ -75,11 +115,14 @@ const Header = () => {
             <CgProfile />
             <li className="listyle">Profile</li>
           </Link>
-          <Link href={"/Client/Services/Applied-services"} className="listdivstyle">
+          <Link
+            href={"/Client/Services/Applied-services"}
+            className="listdivstyle"
+          >
             <MdDownloadDone />
             <li className="listyle">My Applied Services</li>
           </Link>
-          <Link href={"/Client/sign-up"} className="listdivstyle" >
+          <Link href={"/Client/sign-up"} className="listdivstyle">
             <FiUserPlus />
             <li className="listyle">Create new Account</li>
           </Link>

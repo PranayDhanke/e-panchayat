@@ -1,17 +1,35 @@
 "use client";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import {auth} from "@/database/firebase"
+import { toast } from "react-toastify";
 
 export default function ClientLogin() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(()=>{
+    onAuthStateChanged(auth , (user)=>{
+      if (user) {
+        router.push("/")        
+      }
+    })
+  })
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (username == "client" && password == "client") {
-      router.push("/");
+    try {
+      signInWithEmailAndPassword(auth , email , password).then((resopnse)=>{
+        if(resopnse){
+          toast.success("Log in successfully")
+          router.back();
+        }
+      })
+    } catch (error) {
+      
     }
   };
 
@@ -24,14 +42,14 @@ export default function ClientLogin() {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2">
-              Username
+              Email
             </label>
             <input
-              type="text"
+              type="email"
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mb-6">

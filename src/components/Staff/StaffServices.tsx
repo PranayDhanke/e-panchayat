@@ -1,16 +1,16 @@
-"use client";
-import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
-import { CiSearch } from "react-icons/ci";
-import SchemeSkeleton from "../Skeletons/SchemeSkeleton";
-import { get, onValue, ref } from "firebase/database";
 import { database } from "@/database/firebase";
+import { get, ref } from "firebase/database";
+import { useEffect, useState } from "react";
+import SchemeSkeleton from "../Skeletons/SchemeSkeleton";
 import Image from "next/image";
 
-const Schemes = () => {
+const StaffServices = () => {
   const [GrampanchayatSchemes, setGrampanchayatSchemes] = useState([
-    { id: " " },
     {
+      id: "",
+    },
+    {
+      id: "",
       imageUrl: "",
       serviceName: "",
       description: "",
@@ -35,24 +35,23 @@ const Schemes = () => {
         setloading(false);
       }
     });
-  });
+  }, []);
 
   return (
-    <div id="Schemes">
-      <section className="bg-gray-100 py-10">
+    <div>
+      <section className="bg-gray-100">
         <div className="container mx-auto">
-          <h2 className="text-4xl font-bold mb-8 ml-3 underline">Schemes</h2>
           {loading ? (
-            <SchemeSkeleton isadmin={false} />
+            <SchemeSkeleton isadmin={true} />
           ) : (
-            <div className="grid grid-cols-3 mx-5 gap-8">
+            <div className="grid grid-cols-3 gap-5  overflow-y-auto">
               {GrampanchayatSchemes.map((data) => (
                 <div
                   key={data.id}
                   className="bg-white p-6 rounded-lg shadow-md"
                 >
-                  <div className=" relative w-full border h-[30vh] object-cover mb-4 rounded-lg">
-                    <Image src={data.imageUrl || ""} fill alt={""}></Image>
+                  <div className=" relative x w-full border h-[30vh] object-cover mb-4 rounded-lg">
+                    <Image src={data.imageUrl || ""} alt={""} fill></Image>
                   </div>
                   <h3 className="text-xl tracking-wide font-bold mb-2">
                     {data.serviceName}
@@ -63,14 +62,6 @@ const Schemes = () => {
                   <span className="text-xs">Fram : {data.startDate}</span>
                   <br />
                   <span className="text-xs">To : {data.endDate}</span>
-                  <div className="mt-5">
-                    <Link
-                      href={`/Client/Services/Apply/${data.serviceName}`}
-                      className="bg-blue-500 text-white p-2 px-3 rounded-lg font-bold "
-                    >
-                      Apply
-                    </Link>
-                  </div>
                 </div>
               ))}
             </div>
@@ -81,4 +72,4 @@ const Schemes = () => {
   );
 };
 
-export default Schemes;
+export default StaffServices;

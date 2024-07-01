@@ -25,19 +25,17 @@ const SchemeSkeleton = ({ isadmin }: { isadmin: boolean }) => {
           </span>
           {isadmin ? (
             <div className="mt-5 flex gap-4 items-center">
-              <div className=" rounded-md flex items-center gap-2 bg-blue-400 text-white p-2 px-3 font-bold ">
-                <MdEdit />
-                <button className="">Edit</button>
+              <div className=" ">
+                <Skeleton width={80} height={35} />
               </div>
-              <div className=" flex items-center gap-2 rounded-md bg-red-600 text-white p-2 px-3 font-bold ">
-                <MdDelete />
-                <button className="">Delete</button>
+              <div className="">
+                <Skeleton width={80} height={35} />
               </div>
             </div>
           ) : (
             <div className="mt-5">
-              <button className="bg-blue-500 text-white p-2 px-3 rounded-lg font-bold ">
-                Apply
+              <button className="p-2 px-3 ">
+                <Skeleton />
               </button>
             </div>
           )}

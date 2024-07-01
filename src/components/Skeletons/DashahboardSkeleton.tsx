@@ -18,8 +18,8 @@ const DashahboardSkeleton = () => {
         </span>
       </div>
       <div>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          View Form
+        <button className="px-4 py-2 ">
+          <Skeleton width={120} height={35} />
         </button>
       </div>
     </div>

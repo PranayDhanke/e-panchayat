@@ -1,106 +1,87 @@
-"use client"
-import { FormEvent, useEffect, useState } from "react";
-import Image from "next/image";
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaEdit } from "react-icons/fa";
+import { auth, firestore } from "@/database/firebase"; // Ensure correct import paths
+import { onAuthStateChanged } from "firebase/auth";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import Header from "../Home/Header";
+import Image from "next/image";
 
 const Profile = () => {
   const [user, setUser] = useState({
     profileImage: "", // replace with the actual path to the profile image
     name: "",
-    username: "", // new field for username
     email: "",
     mobileNumber: "",
     aadharNumber: "",
   });
+  const [imagePreview, setImagePreview] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    fetch("/profiledata.json").then((response) => {
-      response.json().then((data) => {
-        setUser(data);
-      });
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const userDoc = query(
+          collection(firestore, "Users"),
+          where("uid", "==", currentUser.uid)
+        );
+
+        const userSnap = await getDocs(userDoc);
+
+        userSnap.forEach((doc) => {
+          if (doc.exists()) {
+            const userData = doc.data();
+            setUser({
+              name: userData.name,
+              email: userData.email,
+              mobileNumber: userData.mobile,
+              aadharNumber: userData.aadharnum,
+              profileImage: userData.profileImageUrl,
+            });
+            if (userData.profileImageUrl) {
+              setImagePreview(userData.profileImageUrl);
+            }
+          }
+        });
+      } else {
+        router.replace("/Client/sign-in"); // Redirect to login if not authenticated
+      }
     });
-  }, []); // Add an empty dependency array to useEffect to fetch data only once
 
-  const [imagePreview, setImagePreview] = useState();
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
-    });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
-      setUser({
-        ...user,
-        profileImage: file,
-      });
-    }
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // Here you can handle the form submission, e.g., send the data to an API
-    console.log("Profile updated", user);
-  };
+    return () => unsubscribe();
+  }, [router]);
 
   return (
     <div>
       <Header />
       <div className="min-h-screen py-10 bg-gray-100 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-          <form onSubmit={handleSubmit}>
+          <form>
             <div className="flex justify-center mb-4 relative">
-              <div className="relative ">
-                <img
-                  src={user.profileImage}
-                  alt="Profile Image"
-                  className="rounded-full w-32 h-32"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 hover:opacity-100 transition-opacity">
-                  <label
-                    htmlFor="profileImage"
-                    className="cursor-pointer text-white"
-                  >
-                    <FaEdit size={24} />
-                  </label>
-                  <input
-                    id="profileImage"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </div>
+              <div className="relative w-32 h-32">
+                {imagePreview ? (
+                  <div className="relative w-32 h-32 object-cover">
+                    <Image
+                      fill
+                      src={imagePreview}
+                      alt="Profile Image"
+                      className="rounded-full "
+                    ></Image>
+                  </div>
+                ) : (
+                  <span className="rounded-full text-center p-5 w-32 mt-14 h-32 object-cover">No Image</span>
+                )}
               </div>
             </div>
-            <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="username"
-              >
-                Username
-              </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="username"
-                type="text"
-                name="username"
-                value={user.username}
-                onChange={handleInputChange}
-              />
-            </div>
+
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -114,7 +95,7 @@ const Profile = () => {
                 type="text"
                 name="name"
                 value={user.name}
-                onChange={handleInputChange}
+                readOnly
               />
             </div>
             <div className="mb-4">
@@ -130,7 +111,7 @@ const Profile = () => {
                 type="email"
                 name="email"
                 value={user.email}
-                onChange={handleInputChange}
+                readOnly
               />
             </div>
             <div className="mb-4">
@@ -146,7 +127,7 @@ const Profile = () => {
                 type="text"
                 name="mobileNumber"
                 value={user.mobileNumber}
-                onChange={handleInputChange}
+                readOnly
               />
             </div>
             <div className="mb-4">
@@ -162,16 +143,8 @@ const Profile = () => {
                 type="text"
                 name="aadharNumber"
                 value={user.aadharNumber}
-                onChange={handleInputChange}
+                readOnly
               />
-            </div>
-            <div className="flex items-center justify-between">
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="submit"
-              >
-                Save Changes
-              </button>
             </div>
           </form>
         </div>

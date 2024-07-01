@@ -1,80 +1,104 @@
 import DashahboardSkeleton from "@/components/Skeletons/DashahboardSkeleton";
+import { database } from "@/database/firebase";
+import { onValue, ref, update } from "firebase/database";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { BiCross } from "react-icons/bi";
 import { FaEye } from "react-icons/fa";
 import { MdCancel, MdClose, MdOutlineDownloadDone } from "react-icons/md";
+import { toast } from "react-toastify";
 
 const StaffDashboard = () => {
   const [applicants, setApplicants] = useState([
     {
-      id: "",
-      image: "",
-      applicant_name: "",
-      scheme_name: "",
-      date_applied: "",
+      name: "",
+      profile: "",
+      scheme: "",
+      userid: "",
       email: "",
-      mobile_number: "",
-      aadhar_number: "",
-      addhar_card: "",
+      mobile: "",
+      aadharnum: "",
+      isApproved: false,
+      isRejected: false,
+      applyDate: "",
+      aadharcard: "",
       proof: "",
-      isapproved: false,
-      isrejeted: false,
     },
   ]);
   const [selectedApplicant, setSelectedApplicant] = useState([
     {
-      id: "",
-      image: "",
-      applicant_name: "",
-      scheme_name: "",
-      date_applied: "",
+      name: "",
+      profile: "",
+      scheme: "",
+      userid: "",
       email: "",
-      mobile_number: "",
-      aadhar_number: "",
-      addhar_card: "",
+      mobile: "",
+      aadharnum: "",
+      isApproved: false,
+      isRejected: false,
+      applyDate: "",
+      aadharcard: "",
       proof: "",
-      isapproved: false,
-      isrejeted: false,
     },
   ]);
   const [panel, setpanel] = useState(true);
   const [loading, setloading] = useState(true);
-
   useEffect(() => {
-    fetch("/applicants.json")
-      .then((response) => response.json())
-      .then((data) => {
-        setApplicants(data);
+    const applicantsRef = ref(database, "UserAppliedSchemes");
+    onValue(applicantsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const allApplicants = Array();
+        Object.keys(data).forEach((scheme) => {
+          const schemeApplicants = data[scheme];
+          Object.keys(schemeApplicants).forEach((userid) => {
+            allApplicants.push(schemeApplicants[userid]);
+          });
+        });
+        setApplicants(allApplicants);
         setloading(false);
-      });
+      } else {
+        setApplicants([]);
+        setloading(false);
+      }
+    });
   }, []);
-
   const openPanel = (applicant: any) => {
     setSelectedApplicant([applicant]);
     setpanel(!panel);
   };
 
-  const setApproval = (selectedApplicant: any) => {
-    setApplicants((prevApplicants) =>
-      prevApplicants.map((applicant) =>
-        applicant.id === selectedApplicant.id
-          ? { ...applicant, isapproved: true, isrejeted: false }
-          : applicant
-      )
-    );
-    setpanel(!panel);
+  const setApproval = async (selectedApplicant: any) => {
+    try {
+      const applicantRef = ref(
+        database,
+        `UserAppliedSchemes/${selectedApplicant.scheme}/${selectedApplicant.userid}`
+      );
+      await update(applicantRef, {
+        isApproved: true,
+        isRejected: false,
+      });
+      setpanel(true);
+    } catch (error) {
+      toast.error("Error updating approval status")
+    }
   };
 
-  const setReject = (selectedApplicant: any) => {
-    setApplicants((prevApplicants) =>
-      prevApplicants.map((applicant) =>
-        applicant.id === selectedApplicant.id
-          ? { ...applicant, isrejeted: true, isapproved: false }
-          : applicant
-      )
-    );
-    setpanel(!panel);
+  const setReject = async (selectedApplicant: any) => {
+    try {
+      const applicantRef = ref(
+        database,
+        `UserAppliedSchemes/${selectedApplicant.scheme}/${selectedApplicant.userid}`
+      );
+      await update(applicantRef, {
+        isApproved: false,
+        isRejected: true,
+      });
+      setpanel(true);
+    } catch (error) {
+      toast.error("Error updating approval status")
+    }
   };
 
   return (
@@ -86,25 +110,27 @@ const StaffDashboard = () => {
         <div className="mt-5 grid grid-cols-1 gap-3 p-2">
           {applicants.map((applicant) => (
             <div
-              key={applicant.id}
+              key={applicant.userid}
               className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm"
             >
               <div className="flex items-center">
-                <img
-                  src={applicant.image}
-                  className="w-12 h-12 rounded-full mr-4"
-                  alt={applicant.applicant_name}
-                />
-                <span className="text-xl font-semibold">
-                  {applicant.applicant_name}
-                </span>
+                <div className=" relative w-12 h-12 mr-4">
+                  <Image
+                    src={applicant.profile}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="rounded-full"
+                    alt={applicant.name}
+                  ></Image>
+                </div>
+                <span className="text-xl font-semibold">{applicant.name}</span>
               </div>
               <div>
-                {applicant.isapproved ? (
+                {applicant.isApproved ? (
                   <span className="font-bold text-green-500">Approved</span>
                 ) : (
                   <div>
-                    {applicant.isrejeted ? (
+                    {applicant.isRejected ? (
                       <span className="font-bold text-red-500">Rejected</span>
                     ) : (
                       <span className="font-bold ">Not viwed</span>
@@ -139,13 +165,20 @@ const StaffDashboard = () => {
               />
             </div>
             {selectedApplicant.map((applicant) => (
-              <div>
-                <div className="flex flex-col items-center mt-10">
-                  <img
-                    src={applicant.image}
-                    className="w-32 rounded-full"
-                    alt=""
-                  />
+              <div key={applicant.userid} >
+                <div
+                  key={applicant.userid}
+                  className="flex flex-col items-center mt-10"
+                >
+                  <div className="relative w-32 h-32">
+                    <Image
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      src={applicant.profile || ""}
+                      className="rounded-full"
+                      alt=""
+                    ></Image>
+                  </div>
                 </div>
                 <hr className="mt-5" />
                 <div className="mt-5 grid grid-cols-2 gap-3 w-fit">
@@ -154,17 +187,17 @@ const StaffDashboard = () => {
                   <hr />
                   <br />
                   <span className="font-bold text-lg">Service Name :</span>
-                  <span>{applicant.scheme_name}</span>
+                  <span>{applicant.scheme}</span>
                   <span className="font-bold text-lg">Name : </span>
-                  <span>{applicant.applicant_name}</span>
+                  <span>{applicant.name}</span>
                   <span className="font-bold text-lg">Email : </span>
                   <span>{applicant.email}</span>
                   <span className="font-bold text-lg">Mobile Number :</span>
-                  <span>{applicant.mobile_number}</span>
+                  <span>{applicant.mobile}</span>
                   <span className="font-bold text-lg">Aadhar Number :</span>
-                  <span>{applicant.aadhar_number}</span>
+                  <span>{applicant.aadharnum}</span>
                   <span className="font-bold text-lg">Date Applied :</span>
-                  <span>{applicant.date_applied}</span>
+                  <span>{applicant.applyDate}</span>
                   <hr /> <br />
                   <h1 className="font-bold text-xl">View Uploaded Documents</h1>
                   <br />
@@ -172,7 +205,7 @@ const StaffDashboard = () => {
                   <br />
                   <span className="font-bold text-lg">Aadhar Card</span>
                   <Link
-                    href={applicant.addhar_card}
+                    href={applicant.aadharcard}
                     target="_blank"
                     className="flex items-center gap-2 rounded-md cursor-pointer bg-blue-600 w-fit p-2 text-white"
                   >

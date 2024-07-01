@@ -1,113 +1,118 @@
 "use client";
 import SchemeSkeleton from "@/components/Skeletons/SchemeSkeleton";
-import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
-import { CiSearch } from "react-icons/ci";
+import { database } from "@/database/firebase";
+import { child, get, ref, remove } from "firebase/database";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
+import { toast } from "react-toastify";
+import EditAdminService from "./EditAdminService"; // Import the edit form component
+import { CgClose } from "react-icons/cg";
 
 const AdminServices = () => {
   const [GrampanchayatSchemes, setGrampanchayatSchemes] = useState([
+    { id: "" },
     {
-      imageURL: "",
-      schemeName: "",
+      id: "",
+      imageUrl: "",
+      serviceName: "",
       description: "",
-      fromDate: "",
-      toDate: "",
+      startDate: "",
+      endDate: "",
     },
   ]);
-
-  const [loading, setloading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [editService, setEditService] = useState(null); // State to track the service being edited
+  const router = useRouter();
 
   useEffect(() => {
-    fetch("/schemes.json").then((response) => {
-      response.json().then((data) => {
-        setGrampanchayatSchemes(data);
-        setloading(false);
-      });
-    });
-  });
-
-  const [searchInput, setSearchInput] = useState("");
-
-  const searchSchemes = (event: FormEvent) => {
-    event.preventDefault();
-    if (searchInput == " " || searchInput == "") {
-      setGrampanchayatSchemes(GrampanchayatSchemes);
-    } else {
-      GrampanchayatSchemes.map((map) => {
-        if (map.schemeName == searchInput) {
-          setGrampanchayatSchemes([map]);
+    const refence = ref(database, "Services");
+    get(refence)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const schemeArray = Object.entries(snapshot.val()).map(
+            ([id, data]) => ({
+              id,
+              ...(data as Object),
+            })
+          );
+          setGrampanchayatSchemes(schemeArray);
         }
+      })
+      .catch((error) => {
+        console.error("Error fetching services:", error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
+  }, [editService]); // Refresh when editService changes
+
+  const editScheme = (serviceName:any) => {
+    setEditService(serviceName); // Set the service to be edited
+  };
+
+  const deleteScheme = (serviceName:any) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete scheme: ${serviceName}?`
+    );
+    if (confirmDelete) {
+      remove(child(ref(database, "Services"), serviceName))
+        .then(() => {
+          toast.success("Scheme deleted successfully");
+          setEditService(null); // Clear edit state after deletion
+        })
+        .catch((error) => {
+          toast.error("Error deleting scheme");
+          console.error("Error deleting scheme:", error);
+        });
     }
-  };
-
-  const editScheme = (scheme: any) => {
-    alert(scheme.schemeName)
-  };
-
-  const deleteScheme = (scheme: any) => {
-    alert(scheme.schemeName)
   };
 
   return (
     <div>
       <section className="bg-gray-100">
         <div className="container mx-auto">
-          <div className="py-5">
-            <form onSubmit={searchSchemes} className="flex items-center">
-              <CiSearch className="absolute text-xl ml-3" />
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchInput}
-                className="p-2 border pl-10 outline-none"
-                onChange={(e) => {
-                  setSearchInput(e.target.value);
-                }}
-              />
-              <button
-                type="submit"
-                className="p-2 px-5 bg-blue-500 border-none cursor-pointer outline-none text-white"
-              >
-                Search
-              </button>
-            </form>
-          </div>
           {loading ? (
             <SchemeSkeleton isadmin={true} />
           ) : (
             <div className="grid grid-cols-3 gap-5  overflow-y-auto">
               {GrampanchayatSchemes.map((data) => (
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <img
-                    src={data.imageURL}
-                    alt={""}
-                    className="w-full border h-[30vh] object-cover mb-4 rounded-lg"
-                  />
+                <div
+                  key={data.id}
+                  className="bg-white p-6 rounded-lg shadow-md"
+                >
+                  <div className="relative w-full h-[30vh] mb-4 rounded-lg overflow-hidden">
+                    <Image
+                      src={data.imageUrl || "/placeholder.jpg"}
+                      alt={data.serviceName || ""}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
                   <h3 className="text-xl tracking-wide font-bold mb-2">
-                    {data.schemeName}
+                    {data.serviceName}
                   </h3>
                   <h5 className="text-sm font-semibold mb-2">
                     {data.description}
                   </h5>
-                  <span className="text-xs">Fram : {data.fromDate}</span>
+                  <span className="text-xs">From: {data.startDate}</span>
                   <br />
-                  <span className="text-xs">To : {data.toDate}</span>
+                  <span className="text-xs">To: {data.endDate}</span>
                   <div className="mt-5 flex gap-4 items-center">
                     <div
-                      onClick={() => editScheme(data)}
-                      className=" rounded-md flex items-center gap-2 bg-blue-400 text-white p-2 px-3 font-bold "
+                      onClick={() => editScheme(data.serviceName)}
+                      className="rounded-md flex items-center gap-2 bg-blue-400 text-white p-2 px-3 font-bold cursor-pointer"
                     >
                       <MdEdit />
-                      <button className="">Edit</button>
+                      <span>Edit</span>
                     </div>
                     <div
-                      onClick={() => deleteScheme(data)}
-                      className=" flex items-center gap-2 rounded-md bg-red-600 text-white p-2 px-3 font-bold "
+                      onClick={() => deleteScheme(data.serviceName)}
+                      className="rounded-md flex items-center gap-2 bg-red-600 text-white p-2 px-3 font-bold cursor-pointer"
                     >
                       <MdDelete />
-                      <button className="">Delete</button>
+                      <span>Delete</span>
                     </div>
                   </div>
                 </div>
@@ -116,6 +121,24 @@ const AdminServices = () => {
           )}
         </div>
       </section>
+
+      {/* Edit Service Panel */}
+      {editService && (
+        <div className="fixed inset-0 p flex items-center justify-center bg-gray-800 bg-opacity-50 p-10">
+          <div className="bg-white p-6 rounded-lg shadow-md h-screen overflow-y-auto w-full max-w-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Edit Service</h2>
+              <button
+                onClick={() => setEditService(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <CgClose size={20} />
+              </button>
+            </div>
+            <EditAdminService serviceName={editService} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,24 +1,28 @@
+import { database } from "@/database/firebase";
+import { ref, set } from "firebase/database";
 import React, { FormEvent, useState } from "react";
+import { toast } from "react-toastify";
 
 const AddAdmin = () => {
-    
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
+  const [username, setusername] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log(formData);
+    try {
+      await set(ref(database, `Admin/${username}`), {
+        username: username,
+        password: password,
+      })
+        .then(() => {
+          toast.success("Admin Added Successfully")
+        })
+        .catch(() => {
+          toast.error("Error while adding the admin");
+        });
+    } catch (error) {
+      toast.error("Error")
+    }
   };
 
   return (
@@ -33,9 +37,8 @@ const AddAdmin = () => {
           <label className="block text-gray-700">Username</label>
           <input
             type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
+            value={username}
+            onChange={(e) => setusername(e.target.value)}
             className="mt-1 p-2 border rounded w-full"
             required
           />
@@ -46,8 +49,8 @@ const AddAdmin = () => {
           <input
             type="password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="mt-1 p-2 border rounded w-full"
             required
           />

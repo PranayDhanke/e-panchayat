@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminPanelHeader from "./AdminPanel/AdminPanelHeader";
 import AdminDashboard from "./AdminPanel/Dashboard";
 import AddAdmin from "./AdminPanel/AddAdmin";
@@ -9,14 +9,12 @@ import AddAdminService from "./AdminPanel/AddAdminService";
 
 const AdminPanel = () => {
   const [selectedTab, setSelectedTab] = useState("Dashboard");
-
   return (
     <div>
-      <AdminPanelHeader />
       <div className="flex min-h-screen my-3 shadow-md bg-gray-100 ">
         <nav className="w-1/4 bg-white shadow-md">
           <ul className="space-y-4 p-4">
-          <li
+            <li
               className={`cursor-pointer p-2 ${
                 selectedTab === "Dashboard"
                   ? "bg-blue-500 text-white"
@@ -69,11 +67,31 @@ const AdminPanel = () => {
           </ul>
         </nav>
         <div className="flex-grow p-4">
-          {selectedTab === "Dashboard" && <div><AdminDashboard /></div>}
-          {selectedTab === "Add Admins" && <div><AddAdmin /></div>}
-          {selectedTab === "Add Staff" && <div><AddStaff /></div>}
-          {selectedTab === "Service" && <div><AdminServices /></div>}
-          {selectedTab === "Add Services" && <div><AddAdminService /></div>}
+          {selectedTab === "Dashboard" && (
+            <div>
+              <AdminDashboard />
+            </div>
+          )}
+          {selectedTab === "Add Admins" && (
+            <div>
+              <AddAdmin />
+            </div>
+          )}
+          {selectedTab === "Add Staff" && (
+            <div>
+              <AddStaff />
+            </div>
+          )}
+          {selectedTab === "Service" && (
+            <div>
+              <AdminServices />
+            </div>
+          )}
+          {selectedTab === "Add Services" && (
+            <div>
+              <AddAdminService />
+            </div>
+          )}
         </div>
       </div>
     </div>

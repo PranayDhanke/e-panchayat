@@ -1,24 +1,26 @@
+import { database } from "@/database/firebase";
+import { ref, set } from "firebase/database";
 import React, { FormEvent, useState } from "react";
+import { toast } from "react-toastify";
 
 const AddStaff = () => {
     
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
+  const [username , setusername] = useState("")
+  const [password , setpassword] = useState("")
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log(formData);
+    try {
+      set(ref(database , `Staff/${username}`) , {
+        username : username,
+        password : password
+      }).then(()=>{
+        toast.success("Staff member added successfully")
+      }).catch(()=>{
+        toast.error("Error while adding staff")
+      })
+    } catch (error) {
+      toast.error("Error")
+    }
   };
 
   return (
@@ -34,8 +36,8 @@ const AddStaff = () => {
           <input
             type="text"
             name="username"
-            value={formData.username}
-            onChange={handleChange}
+            value={username}
+            onChange={(e)=>setusername(e.target.value)}
             className="mt-1 p-2 border rounded w-full"
             required
           />
@@ -46,8 +48,8 @@ const AddStaff = () => {
           <input
             type="password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e)=>setpassword(e.target.value)}
             className="mt-1 p-2 border rounded w-full"
             required
           />

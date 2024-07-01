@@ -1,6 +1,9 @@
 "use client";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { get, ref } from "firebase/database";
+import { auth, database } from "@/database/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function StaffLogin() {
   const router = useRouter();
@@ -9,8 +12,28 @@ export default function StaffLogin() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (username == "staff" && password == "staff") {
-      router.push("/Staff");
+    try {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          alert("Log out first");
+        } else {
+          get(ref(database, "Admin")).then((Response) => {
+            if (Response.exists()) {
+              if (Response.child(username).exists()) {
+                const data = Response.child(username).exportVal();
+                if (username == data.username && password == data.password) {
+                  alert("Staff logged in");
+                  router.replace(`/Staff/Home/${username}`);
+                } else {
+                  alert("Incorrect Username or password");
+                }
+              }
+            }
+          });
+        }
+      });
+    } catch (error) {
+      alert(error);
     }
   };
 

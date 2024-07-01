@@ -10,4 +10,8 @@
     .listdivstyle {
         @apply flex p-2 gap-2 cursor-pointer items-center hover:bg-slate-50
     }
+
+    .submitinput{
+        @apply border rounded w-full py-2 px-3 text-gray-700 leading-tight
+    }
 }

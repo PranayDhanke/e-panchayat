@@ -157,7 +157,7 @@ const AdminDashboard = () => {
         ""
       ) : (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 w-full md:w-1/2 h-full md:h-auto overflow-y-scroll rounded-lg shadow-lg">
+          <div className="bg-white p-6 w-full md:w-1/2 h-full overflow-y-scroll rounded-lg shadow-lg">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Application</h2>
               <MdClose

@@ -108,7 +108,8 @@ const AdminDashboard = () => {
         <DashahboardSkeleton />
       ) : (
         <div className="mt-5 grid grid-cols-1 gap-3 p-2">
-          {applicants.map((applicant) => (
+          {applicants
+          .map((applicant) => (
             <div
               key={applicant.userid}
               className="flex flex-col md:flex-row items-center justify-between bg-white p-4 rounded-lg shadow-sm"

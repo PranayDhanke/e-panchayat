@@ -9,6 +9,7 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
 import EditAdminService from "./EditAdminService"; // Import the edit form component
 import { CgClose } from "react-icons/cg";
+import { CiSearch } from "react-icons/ci";
 
 const AdminServices = () => {
   const [GrampanchayatSchemes, setGrampanchayatSchemes] = useState([
@@ -69,15 +70,35 @@ const AdminServices = () => {
     }
   };
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredSchemes = GrampanchayatSchemes.filter((scheme) =>
+    scheme.serviceName
+      ? scheme.serviceName.toLowerCase().includes(searchQuery.toLowerCase())
+      : "Empty"
+  );
+
   return (
     <div>
       <section className="bg-gray-100">
         <div className="container mx-auto">
+        <div className="py-10 pl-5">
+            <div className="flex bg-white items-center ps-2 p-1 pr-10 border w-fit h-fit ">
+            <CiSearch size={20} color="gray"  />
+              <input
+                type="text"
+                placeholder="Search Schemes"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="p-2 outline-none border-none"
+              />
+            </div>
+          </div>
           {loading ? (
             <SchemeSkeleton isadmin={true} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-5 overflow-y-auto">
-              {GrampanchayatSchemes.map((data) => (
+              {filteredSchemes.map((data) => (
                 <div
                   key={data.id}
                   className="bg-white p-6 rounded-lg shadow-md"

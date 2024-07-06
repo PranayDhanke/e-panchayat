@@ -7,37 +7,39 @@ import { FormEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function AdminLogin() {
+  const router = useRouter();
 
-    const router = useRouter();
-
+  useEffect(() => {
+   onAuthStateChanged(auth , user => {
+    if(user){
+      toast.warn("First log Out");
+      router.push("/");
+    }else{
+      return;
+    }
+   })
+  });
   const [username, setusername] = useState("");
   const [password, setpassword] = useState("");
 
   const loginAdmin = async (event: FormEvent) => {
     event.preventDefault();
     try {
-      onAuthStateChanged(auth , (user)=>{
-        if (user) {
-          toast.warning("Logout first")
-          router.push("/")
-        }else{
-          get(ref(database , "Admin")).then((Response)=>{
-            if (Response.exists()) {
-              if (Response.child(username).exists()) {
-                const data = Response.child(username).exportVal();
-                if (username == data.username && password == data.password) {
-                  toast.success("Admin Logged in");
-                  router.push(`/Admin/Home/${username}`)
-                }else{
-                  toast.error("Incorrect Username or password");
-                }
-              }
+      get(ref(database, "Admin")).then((Response) => {
+        if (Response.exists()) {
+          if (Response.child(username).exists()) {
+            const data = Response.child(username).exportVal();
+            if (username == data.username && password == data.password) {
+              toast.success("Admin Logged in");
+              router.push(`/Admin/Home/${username}`);
+            } else {
+              toast.error("Incorrect Username or password");
             }
-          })
+          }
         }
-      })
+      });
     } catch (error) {
-      toast.error("Error")
+      toast.error("Error");
     }
   };
   return (
@@ -48,7 +50,9 @@ export default function AdminLogin() {
         </h2>
         <form onSubmit={loginAdmin}>
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2">Username</label>
+            <label className="block text-gray-700 font-bold mb-2">
+              Username
+            </label>
             <input
               type="text"
               value={username}
@@ -64,7 +68,7 @@ export default function AdminLogin() {
             <input
               type="password"
               value={password}
-              onChange={(e)=>setpassword(e.target.value)}
+              onChange={(e) => setpassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="Enter your password"
             />

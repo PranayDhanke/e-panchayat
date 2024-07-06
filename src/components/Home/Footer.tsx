@@ -21,28 +21,28 @@ const Footer = () => {
         </div>
         <div className="flex space-x-6 mb-6">
           <a
-            href="https://twitter.com"
+            href="https://twitter.com/pranaydhanke33?t=hrHjKL9cuivSUcV424V8ew&s=08"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaTwitter className="text-2xl hover:text-blue-500" />
           </a>
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/pranaydhanke33/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaInstagram className="text-2xl hover:text-pink-500" />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://in.linkedin.com/in/pranay-dhanke-176a66263"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaLinkedin className="text-2xl hover:text-blue-700" />
           </a>
           <a
-            href="https://github.com"
+            href="https://github.com/PranayDhanke"
             target="_blank"
             rel="noopener noreferrer"
           >

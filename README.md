@@ -59,7 +59,7 @@ Staff Role :
 
 Clone the repository: 
 ```bash
- git clone https://github.com/PranayDhanke/e-panchayat
+ git clone https://github.com/PranayDhanke/e-panchayat.git
  cd e-gram-panchayat
 ```
 Install dependencies:

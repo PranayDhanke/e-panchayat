@@ -6,6 +6,7 @@ Overview :
 
 E-Gram Panchayat aims to digitize the application and management process for various schemes, providing a streamlined and efficient way for end users to apply for schemes and for administrators to manage them. The application enhances transparency, accessibility, and efficiency in rural governance. With E-Gram Panchayat, rural governance is transformed, making scheme application and management processes more transparent, accessible, and efficient.
 
+Project Link - https://e-gram.vercel.app/
 
 ## Tech Stack
 
@@ -92,4 +93,8 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Feedback
 
 If you have any feedback, please reach out to us at pranaydhanke33@gmail.com
+
+
+
+
 
